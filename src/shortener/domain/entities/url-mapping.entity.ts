@@ -68,4 +68,12 @@ export class UrlMapping {
 
     return new UrlMapping(newProps);
   }
+
+  public updateOriginalUrl(newUrl: string): UrlMapping {
+    const newProps = { ...this.props };
+    newProps.originalUrl = newUrl;
+    newProps.updatedAt = new Date();
+
+    return new UrlMapping(newProps);
+  }
 }
