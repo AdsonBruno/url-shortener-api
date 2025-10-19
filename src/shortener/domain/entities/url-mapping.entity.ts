@@ -56,4 +56,16 @@ export class UrlMapping {
 
     return new UrlMapping(newProps);
   }
+
+  public softDelete(): UrlMapping {
+    if (this.props.deletedAt) {
+      return this;
+    }
+
+    const newProps = { ...this.props };
+    newProps.deletedAt = new Date();
+    newProps.updatedAt = new Date();
+
+    return new UrlMapping(newProps);
+  }
 }
