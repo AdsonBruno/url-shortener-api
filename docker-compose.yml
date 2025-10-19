@@ -1,20 +1,34 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
+  api:
+    build: .
+    container_name: url_shortener_api
+    ports:
+      - "3000:3000"
     environment:
+      - BASE_URL=http://localhost:3000
+      - DB_HOST=postgres_db
+      - DB_PORT=5432
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+      - DB_DATABASE=url_shortener
+    depends_on:
+      - postgres_db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: url_shortener_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: url_shortener
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user -d url_shortener" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - pgdata:/var/lib/postgresql/data
 volumes:
-  postgres_data:
+  pgdata:
