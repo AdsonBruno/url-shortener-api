@@ -1,6 +1,6 @@
 import { UrlMapping } from '../entities/url-mapping.entity';
 
-export interface UrlMappingRepository {
+export interface IUrlMappingRepository {
   save(urlMapping: UrlMapping): Promise<void>;
 
   findByShortUrlKey(shortUrlKey: string): Promise<UrlMapping | null>;
@@ -9,3 +9,5 @@ export interface UrlMappingRepository {
 
   findAllByUserId(userId: string): Promise<UrlMapping[]>;
 }
+
+export const URL_MAPPING_REPOSITORY = 'UrlMappingRepository';

@@ -2,7 +2,7 @@ export interface UrlMappingProps {
   id: string;
   originalUrl: string;
   shortUrlKey: string;
-  userId: string;
+  userId: string | null;
   accessCount: number;
   createdAt: Date;
   updatedAt: Date;
