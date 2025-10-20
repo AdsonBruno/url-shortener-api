@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { UrlMapping } from '../../domain/entities/url-mapping.entity';
 import { URL_MAPPING_REPOSITORY } from '../../domain/repositories/url-mapping.repository';
 import type { IUrlMappingRepository } from '../../domain/repositories/url-mapping.repository';
+import type { IIdGenerator } from '../ports/id-generator.interface';
+import { ID_GENERATOR } from '../ports/id-generator.interface';
 import { CreateShortUrlDto } from '../dtos/create-short-url.dto';
 
 @Injectable()
@@ -10,12 +11,14 @@ export class CreateShortUrlUseCase {
   constructor(
     @Inject(URL_MAPPING_REPOSITORY)
     private readonly urlMappingRepository: IUrlMappingRepository,
+    @Inject(ID_GENERATOR)
+    private readonly idGenerator: IIdGenerator,
   ) {}
 
   async execute(dto: CreateShortUrlDto): Promise<UrlMapping> {
     const slug = this.generateRandomSlug();
 
-    const entityId = randomUUID();
+    const entityId = this.idGenerator.generate();
 
     const urlMapping = UrlMapping.create({
       id: entityId,
