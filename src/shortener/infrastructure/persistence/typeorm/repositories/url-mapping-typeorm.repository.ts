@@ -12,8 +12,8 @@ export class UrlMappingTypeOrmRepository implements IUrlMappingRepository {
     private readonly typeOrmRepo: Repository<UrlMappingSchema>,
   ) {}
 
-  async save(UrlMapping: UrlMapping): Promise<void> {
-    const schema = this.typeOrmRepo.create(UrlMapping.props);
+  async save(urlMapping: UrlMapping): Promise<void> {
+    const schema = this.typeOrmRepo.create(urlMapping.props);
     await this.typeOrmRepo.save(schema);
   }
 

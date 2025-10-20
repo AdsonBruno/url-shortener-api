@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UrlMappingSchema } from './infrastructure/persistence/typeorm/schemas/url-mapping.schema';
 import { URL_MAPPING_REPOSITORY } from './domain/repositories/url-mapping.repository';
 import { UrlMappingTypeOrmRepository } from './infrastructure/persistence/typeorm/repositories/url-mapping-typeorm.repository';
+import { ShortenerController } from './presentation/http/shortner.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UrlMappingSchema])],
-  controllers: [],
+  controllers: [ShortenerController],
   providers: [
     CreateShortUrlUseCase,
     {
@@ -22,4 +23,4 @@ import { UrlMappingTypeOrmRepository } from './infrastructure/persistence/typeor
     },
   ],
 })
-export class ShortnerModule {}
+export class ShortenerModule {}
