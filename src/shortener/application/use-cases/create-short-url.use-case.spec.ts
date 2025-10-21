@@ -151,4 +151,15 @@ describe('CreateShortUrlUseCase', () => {
       expect(saveSpy).toHaveBeenCalledWith(result);
     });
   });
+
+  describe('ID Generator interaction', () => {
+    it('should call ID generator to create entity ID', async () => {
+      const { sut, idGeneratorStub } = makeSut();
+      const generateSpy = jest.spyOn(idGeneratorStub, 'generate');
+
+      await sut.execute(validInput);
+
+      expect(generateSpy).toHaveBeenCalledTimes(1);
+    });
+  });
 });
