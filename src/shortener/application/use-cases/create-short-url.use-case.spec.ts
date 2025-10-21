@@ -103,4 +103,14 @@ describe('CreateShortUrlUseCase', () => {
       expect(result.props.userId).toBeNull();
     });
   });
+
+  describe('Short URL key generation', () => {
+    it('should generate a shgort URL key with 6 characters', async () => {
+      const { sut } = makeSut();
+
+      const result = await sut.execute(validInput);
+
+      expect(result.props.shortUrlKey).toHaveLength(6);
+    });
+  });
 });
