@@ -85,5 +85,13 @@ describe('CreateShortUrlUseCase', () => {
 
       expect(result.props.id).toBe('valid-uuid');
     });
+
+    it('should create URL mapping with correct user ID', async () => {
+      const { sut } = makeSut();
+
+      const result = await sut.execute(validInput);
+
+      expect(result.props.userId).toBe(validInput.userId);
+    });
   });
 });
