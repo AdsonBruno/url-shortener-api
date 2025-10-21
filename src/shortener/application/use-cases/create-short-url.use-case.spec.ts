@@ -13,6 +13,10 @@ class UrlMappingRepositoryStub implements IUrlMappingRepository {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
+  async findBySlugOrAlias(): Promise<UrlMapping | null> {
+    return Promise.resolve<UrlMapping | null>(null);
+  }
+
   async findById(): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
@@ -245,6 +249,8 @@ describe('CreateShortUrlUseCase', () => {
             id: 'existing-id',
             originalUrl: 'https://existing.com',
             shortUrlKey: 'abc123',
+            customAlias: undefined,
+            isCustomAlias: false,
             userId: null,
           }),
         )
@@ -268,6 +274,8 @@ describe('CreateShortUrlUseCase', () => {
           id: 'existing-id',
           originalUrl: 'https://existing.com',
           shortUrlKey: 'abc123',
+          customAlias: undefined,
+          isCustomAlias: false,
           userId: null,
         }),
       );

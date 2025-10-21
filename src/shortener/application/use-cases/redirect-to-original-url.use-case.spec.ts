@@ -4,11 +4,15 @@ import { NotFoundException } from '../exceptions/not-found.exception';
 import { RedirectToOriginalUrlUseCase } from './redirect-to-original-url.use-case';
 
 class UrlMappingRepositoryStub implements IUrlMappingRepository {
-  async save(urlMapping: UrlMapping): Promise<void> {
+  async save(_urlMapping: UrlMapping): Promise<void> {
     return Promise.resolve();
   }
 
-  async findByShortUrlKey(key: string): Promise<UrlMapping | null> {
+  async findByShortUrlKey(_key: string): Promise<UrlMapping | null> {
+    return Promise.resolve<UrlMapping | null>(null);
+  }
+
+  async findBySlugOrAlias(_key: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
@@ -41,6 +45,8 @@ const makeValidUrlMapping = (): UrlMapping => {
     id: 'valid-id',
     originalUrl: 'https://example.com',
     shortUrlKey: 'abc123',
+    customAlias: undefined,
+    isCustomAlias: false,
     userId: null,
   });
 };
@@ -56,7 +62,7 @@ describe('RedirectToOriginalUrlUseCase', () => {
       const { sut, urlMappingRepositoryStub } = makeSut();
       const urlMapping = makeValidUrlMapping();
       jest
-        .spyOn(urlMappingRepositoryStub, 'findByShortUrlKey')
+        .spyOn(urlMappingRepositoryStub, 'findBySlugOrAlias')
         .mockResolvedValue(urlMapping);
 
       const result = await sut.execute('abc123');
@@ -68,7 +74,7 @@ describe('RedirectToOriginalUrlUseCase', () => {
       const { sut, urlMappingRepositoryStub } = makeSut();
       const urlMapping = makeValidUrlMapping();
       jest
-        .spyOn(urlMappingRepositoryStub, 'findByShortUrlKey')
+        .spyOn(urlMappingRepositoryStub, 'findBySlugOrAlias')
         .mockResolvedValue(urlMapping);
 
       const saveSpy = jest.spyOn(urlMappingRepositoryStub, 'save');
@@ -86,7 +92,7 @@ describe('RedirectToOriginalUrlUseCase', () => {
       const { sut, urlMappingRepositoryStub } = makeSut();
       const urlMapping = makeValidUrlMapping();
       jest
-        .spyOn(urlMappingRepositoryStub, 'findByShortUrlKey')
+        .spyOn(urlMappingRepositoryStub, 'findBySlugOrAlias')
         .mockResolvedValue(urlMapping);
 
       const saveSpy = jest.spyOn(urlMappingRepositoryStub, 'save');
@@ -101,7 +107,7 @@ describe('RedirectToOriginalUrlUseCase', () => {
     it('should throw NotFoundException when URL mapping does not exist', async () => {
       const { sut, urlMappingRepositoryStub } = makeSut();
       jest
-        .spyOn(urlMappingRepositoryStub, 'findByShortUrlKey')
+        .spyOn(urlMappingRepositoryStub, 'findBySlugOrAlias')
         .mockResolvedValue(null);
 
       await expect(sut.execute('nonexistent')).rejects.toThrow(
@@ -116,7 +122,7 @@ describe('RedirectToOriginalUrlUseCase', () => {
       const { sut, urlMappingRepositoryStub } = makeSut();
       const deletedUrlMapping = makeValidUrlMapping().softDelete();
       jest
-        .spyOn(urlMappingRepositoryStub, 'findByShortUrlKey')
+        .spyOn(urlMappingRepositoryStub, 'findBySlugOrAlias')
         .mockResolvedValue(deletedUrlMapping);
 
       await expect(sut.execute('abc123')).rejects.toThrow(NotFoundException);
@@ -127,10 +133,10 @@ describe('RedirectToOriginalUrlUseCase', () => {
   });
 
   describe('Repository interaction', () => {
-    it('should call repository findByShortUrlKey with correct parameter', async () => {
+    it('should call repository findBySlugOrAlias with correct parameter', async () => {
       const { sut, urlMappingRepositoryStub } = makeSut();
       const findSpy = jest
-        .spyOn(urlMappingRepositoryStub, 'findByShortUrlKey')
+        .spyOn(urlMappingRepositoryStub, 'findBySlugOrAlias')
         .mockResolvedValue(makeValidUrlMapping());
 
       await sut.execute('test123');
