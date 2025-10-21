@@ -93,5 +93,14 @@ describe('CreateShortUrlUseCase', () => {
 
       expect(result.props.userId).toBe(validInput.userId);
     });
+
+    it('should create URL mapping with null user ID when not provided', async () => {
+      const { sut } = makeSut();
+      const inputWithoutUserId = { originalUrl: 'https://example.com/' };
+
+      const result = await sut.execute(inputWithoutUserId);
+
+      expect(result.props.userId).toBeNull();
+    });
   });
 });
