@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ShortnerModule } from './shortener/shortner.module';
+import { ShortenerModule } from './shortener/shortener.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    ShortnerModule,
+    ShortenerModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -19,6 +19,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
+
+        autoLoadEntities: true,
         synchronize: true,
       }),
     }),
