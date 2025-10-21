@@ -2,6 +2,8 @@ export interface UrlMappingProps {
   id: string;
   originalUrl: string;
   shortUrlKey: string;
+  customAlias?: string;
+  isCustomAlias: boolean;
   userId: string | null;
   accessCount: number;
   createdAt: Date;
@@ -47,6 +49,14 @@ export class UrlMapping {
 
   public get shortUrlKey(): string {
     return this.props.shortUrlKey;
+  }
+
+  public get effectiveKey(): string {
+    return this.props.customAlias || this.props.shortUrlKey;
+  }
+
+  public get isCustomAlias(): boolean {
+    return this.props.isCustomAlias;
   }
 
   public incrementAccessCount(): UrlMapping {

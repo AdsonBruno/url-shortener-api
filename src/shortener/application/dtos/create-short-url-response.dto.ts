@@ -3,6 +3,8 @@ export class CreateShortUrlResponseDto {
   originalUrl: string;
   shortUrl: string;
   shortUrlKey: string;
+  customAlias?: string;
+  isCustomAlias: boolean;
   userId?: string;
   createdAt: Date;
 }

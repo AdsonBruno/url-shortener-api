@@ -5,6 +5,8 @@ export interface IUrlMappingRepository {
 
   findByShortUrlKey(shortUrlKey: string): Promise<UrlMapping | null>;
 
+  findBySlugOrAlias(key: string): Promise<UrlMapping | null>;
+
   findById(id: string): Promise<UrlMapping | null>;
 
   findAllByUserId(userId: string): Promise<UrlMapping[]>;
