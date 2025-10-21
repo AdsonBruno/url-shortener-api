@@ -5,6 +5,8 @@ import type { IUrlMappingRepository } from '../../domain/repositories/url-mappin
 import type { IIdGenerator } from '../ports/id-generator.interface';
 import { ID_GENERATOR } from '../ports/id-generator.interface';
 import { CreateShortUrlDto } from '../dtos/create-short-url.dto';
+import { ValidationException } from '../exceptions/validation.exception';
+import { ConflictException } from '../exceptions/conflict.exception';
 
 @Injectable()
 export class CreateShortUrlUseCase {
@@ -16,7 +18,30 @@ export class CreateShortUrlUseCase {
   ) {}
 
   async execute(dto: CreateShortUrlDto): Promise<UrlMapping> {
-    const slug = this.generateRandomSlug();
+    // Validação de entrada
+    this.validateInput(dto);
+
+    let slug: string;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    // Gera slug único com tratamento de colisão
+    do {
+      if (attempts >= maxAttempts) {
+        throw new ConflictException('Unable to generate unique short URL key');
+      }
+
+      slug = this.generateRandomSlug();
+      const existingUrlMapping =
+        await this.urlMappingRepository.findByShortUrlKey(slug);
+
+      if (!existingUrlMapping) {
+        break;
+      }
+
+      attempts++;
+      // eslint-disable-next-line no-constant-condition
+    } while (true);
 
     const entityId = this.idGenerator.generate();
 
@@ -30,6 +55,18 @@ export class CreateShortUrlUseCase {
     await this.urlMappingRepository.save(urlMapping);
 
     return urlMapping;
+  }
+
+  private validateInput(dto: CreateShortUrlDto): void {
+    if (!dto.originalUrl || dto.originalUrl.trim() === '') {
+      throw new ValidationException('Original URL is required');
+    }
+
+    try {
+      new URL(dto.originalUrl);
+    } catch {
+      throw new ValidationException('Invalid URL format');
+    }
   }
 
   private generateRandomSlug(length = 6): string {
