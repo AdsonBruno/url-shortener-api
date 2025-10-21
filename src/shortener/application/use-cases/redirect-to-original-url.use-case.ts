@@ -12,7 +12,7 @@ export class RedirectToOriginalUrlUseCase {
 
   async execute(shortUrlKey: string): Promise<string> {
     const urlMapping =
-      await this.urlMappingRepository.findByShortUrlKey(shortUrlKey);
+      await this.urlMappingRepository.findBySlugOrAlias(shortUrlKey);
 
     if (!urlMapping || urlMapping.props.deletedAt) {
       throw new NotFoundException('Short URL not found');
