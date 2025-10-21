@@ -131,4 +131,15 @@ describe('CreateShortUrlUseCase', () => {
       expect(result.props.shortUrlKey).toMatch(alphanumericRegex);
     });
   });
+
+  describe('Repository interaction', () => {
+    it('should call repository save method', async () => {
+      const { sut, urlMappingRepositoryStub } = makeSut();
+      const saveSpy = jest.spyOn(urlMappingRepositoryStub, 'save');
+
+      await sut.execute(validInput);
+
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+  });
 });
