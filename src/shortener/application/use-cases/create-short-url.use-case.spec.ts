@@ -50,9 +50,24 @@ const makeSut = (): SutTypes => {
 };
 
 describe('CreateShortUrlUseCase', () => {
+  const validInput = {
+    originalUrl: 'https://example.com/',
+    userId: 'valid-user-id',
+  };
+
   it('should be defined', () => {
     const { sut } = makeSut();
 
     expect(sut).toBeDefined();
+  });
+
+  describe('URL mapping creation', () => {
+    it('should return a UrlMapping instance', async () => {
+      const { sut } = makeSut();
+
+      const result = await sut.execute(validInput);
+
+      expect(result).toBeInstanceOf(UrlMapping);
+    });
   });
 });
