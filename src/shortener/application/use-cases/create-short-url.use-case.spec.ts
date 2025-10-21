@@ -141,5 +141,14 @@ describe('CreateShortUrlUseCase', () => {
 
       expect(saveSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('should call repository save with created URL mapping', async () => {
+      const { sut, urlMappingRepositoryStub } = makeSut();
+      const saveSpy = jest.spyOn(urlMappingRepositoryStub, 'save');
+
+      const result = await sut.execute(validInput);
+
+      expect(saveSpy).toHaveBeenCalledWith(result);
+    });
   });
 });
