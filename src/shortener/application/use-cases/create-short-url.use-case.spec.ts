@@ -112,5 +112,14 @@ describe('CreateShortUrlUseCase', () => {
 
       expect(result.props.shortUrlKey).toHaveLength(6);
     });
+
+    it('should generate different short URL keys for multiple executions', async () => {
+      const { sut } = makeSut();
+
+      const result1 = await sut.execute(validInput);
+      const result2 = await sut.execute(validInput);
+
+      expect(result1.props.shortUrlKey).not.toBe(result2.props.shortUrlKey);
+    });
   });
 });
