@@ -48,11 +48,15 @@ export class ShortenerController {
   }
 
   private mapToResponseDto(urlMapping: UrlMapping): CreateShortUrlResponseDto {
+    const effectiveKey = urlMapping.effectiveKey;
+
     return {
       id: urlMapping.props.id,
       originalUrl: urlMapping.props.originalUrl,
-      shortUrl: `http://localhost:3000/${urlMapping.props.shortUrlKey}`,
+      shortUrl: `http://localhost:3000/${effectiveKey}`,
       shortUrlKey: urlMapping.props.shortUrlKey,
+      customAlias: urlMapping.props.customAlias || undefined,
+      isCustomAlias: urlMapping.props.isCustomAlias,
       userId: urlMapping.props.userId || undefined,
       createdAt: urlMapping.props.createdAt,
     };
