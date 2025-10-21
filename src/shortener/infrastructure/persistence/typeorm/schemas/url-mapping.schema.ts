@@ -18,6 +18,12 @@ export class UrlMappingSchema {
   @Column({ unique: true })
   shortUrlKey: string;
 
+  @Column({ length: 30, nullable: true, unique: true })
+  customAlias: string | null;
+
+  @Column({ default: false })
+  isCustomAlias: boolean;
+
   @Column({ type: 'uuid', nullable: true })
   userId: string | null;
 

@@ -23,6 +23,14 @@ export class UrlMappingTypeOrmRepository implements IUrlMappingRepository {
     return schema ? UrlMapping.hydrate(schema) : null;
   }
 
+  async findBySlugOrAlias(key: string): Promise<UrlMapping | null> {
+    const schema = await this.typeOrmRepo.findOne({
+      where: [{ shortUrlKey: key }, { customAlias: key }],
+    });
+
+    return schema ? UrlMapping.hydrate(schema) : null;
+  }
+
   async findById(id: string): Promise<UrlMapping | null> {
     const schema = await this.typeOrmRepo.findOne({ where: { id } });
 
