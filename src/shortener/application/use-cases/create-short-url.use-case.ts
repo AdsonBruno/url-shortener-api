@@ -18,14 +18,12 @@ export class CreateShortUrlUseCase {
   ) {}
 
   async execute(dto: CreateShortUrlDto): Promise<UrlMapping> {
-    // Validação de entrada
     this.validateInput(dto);
 
     let slug: string;
     let attempts = 0;
     const maxAttempts = 10;
 
-    // Gera slug único com tratamento de colisão
     do {
       if (attempts >= maxAttempts) {
         throw new ConflictException('Unable to generate unique short URL key');
