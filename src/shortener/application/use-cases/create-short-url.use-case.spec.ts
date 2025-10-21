@@ -121,5 +121,14 @@ describe('CreateShortUrlUseCase', () => {
 
       expect(result1.props.shortUrlKey).not.toBe(result2.props.shortUrlKey);
     });
+
+    it('should generate short URL key with alphanumeric characters', async () => {
+      const { sut } = makeSut();
+      const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+
+      const result = await sut.execute(validInput);
+
+      expect(result.props.shortUrlKey).toMatch(alphanumericRegex);
+    });
   });
 });
