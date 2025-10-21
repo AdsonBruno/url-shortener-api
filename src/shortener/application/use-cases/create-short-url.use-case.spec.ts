@@ -2,21 +2,22 @@ import { UrlMapping } from '../../domain/entities/url-mapping.entity';
 import type { IUrlMappingRepository } from '../../domain/repositories/url-mapping.repository';
 import { IIdGenerator } from '../ports/id-generator.interface';
 import { CreateShortUrlUseCase } from './create-short-url.use-case';
+import { CreateShortUrlDto } from '../dtos/create-short-url.dto';
 
 class UrlMappingRepositoryStub implements IUrlMappingRepository {
-  async save(urlMapping: UrlMapping): Promise<void> {
+  async save(_urlMapping: UrlMapping): Promise<void> {
     return Promise.resolve();
   }
 
-  async findByShortUrlKey(_key: string): Promise<UrlMapping | null> {
+  async findByShortUrlKey(): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findById(_id: string): Promise<UrlMapping | null> {
+  async findById(): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findAllByUserId(_userId: string): Promise<UrlMapping[]> {
+  async findAllByUserId(): Promise<UrlMapping[]> {
     return Promise.resolve<UrlMapping[]>([]);
   }
 }
@@ -160,6 +161,120 @@ describe('CreateShortUrlUseCase', () => {
       await sut.execute(validInput);
 
       expect(generateSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Input validation', () => {
+    it('should throw error when original URL is null', async () => {
+      const { sut } = makeSut();
+      const invalidInput = {
+        originalUrl: null,
+      } as unknown as CreateShortUrlDto;
+
+      await expect(sut.execute(invalidInput)).rejects.toThrow(
+        'Original URL is required',
+      );
+    });
+
+    it('should throw error when original URL is empty', async () => {
+      const { sut } = makeSut();
+      const invalidInput = { originalUrl: '', userId: 'user-123' };
+
+      await expect(sut.execute(invalidInput)).rejects.toThrow(
+        'Original URL is required',
+      );
+    });
+
+    it('should throw error when original URL is not a valid URL', async () => {
+      const { sut } = makeSut();
+      const invalidInput = { originalUrl: 'invalid-url', userId: 'user-123' };
+
+      await expect(sut.execute(invalidInput)).rejects.toThrow(
+        'Invalid URL format',
+      );
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should throw error when ID generator fails', async () => {
+      const { sut, idGeneratorStub } = makeSut();
+      jest.spyOn(idGeneratorStub, 'generate').mockImplementation(() => {
+        throw new Error('ID generation failed');
+      });
+
+      await expect(sut.execute(validInput)).rejects.toThrow(
+        'ID generation failed',
+      );
+    });
+
+    it('should throw error when repository save fails', async () => {
+      const { sut, urlMappingRepositoryStub } = makeSut();
+      jest
+        .spyOn(urlMappingRepositoryStub, 'save')
+        .mockRejectedValue(new Error('Database connection failed'));
+
+      await expect(sut.execute(validInput)).rejects.toThrow(
+        'Database connection failed',
+      );
+    });
+  });
+
+  describe('Hash collision handling', () => {
+    it('should check if generated slug already exists', async () => {
+      const { sut, urlMappingRepositoryStub } = makeSut();
+      const findByShortUrlKeySpy = jest.spyOn(
+        urlMappingRepositoryStub,
+        'findByShortUrlKey',
+      );
+
+      await sut.execute(validInput);
+
+      expect(findByShortUrlKeySpy).toHaveBeenCalled();
+    });
+
+    it('should regenerate slug when collision occurs', async () => {
+      const { sut, urlMappingRepositoryStub } = makeSut();
+      const findByShortUrlKeySpy = jest.spyOn(
+        urlMappingRepositoryStub,
+        'findByShortUrlKey',
+      );
+
+      findByShortUrlKeySpy
+        .mockResolvedValueOnce(
+          UrlMapping.create({
+            id: 'existing-id',
+            originalUrl: 'https://existing.com',
+            shortUrlKey: 'abc123',
+            userId: null,
+          }),
+        )
+        .mockResolvedValueOnce(null);
+      const result = await sut.execute(validInput);
+
+      expect(findByShortUrlKeySpy).toHaveBeenCalledTimes(2);
+      expect(result).toBeInstanceOf(UrlMapping);
+    });
+
+    it('should limit retry attempts for slug generation', async () => {
+      const { sut, urlMappingRepositoryStub } = makeSut();
+
+      const findByShortUrlKeySpy = jest.spyOn(
+        urlMappingRepositoryStub,
+        'findByShortUrlKey',
+      );
+
+      findByShortUrlKeySpy.mockResolvedValue(
+        UrlMapping.create({
+          id: 'existing-id',
+          originalUrl: 'https://existing.com',
+          shortUrlKey: 'abc123',
+          userId: null,
+        }),
+      );
+
+      await expect(sut.execute(validInput)).rejects.toThrow(
+        'Unable to generate unique short URL key',
+      );
     });
   });
 });
