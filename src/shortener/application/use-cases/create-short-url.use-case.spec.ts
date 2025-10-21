@@ -69,5 +69,13 @@ describe('CreateShortUrlUseCase', () => {
 
       expect(result).toBeInstanceOf(UrlMapping);
     });
+
+    it('should create URL mapping with correct original URL', async () => {
+      const { sut } = makeSut();
+
+      const result = await sut.execute(validInput);
+
+      expect(result.props.originalUrl).toBe(validInput.originalUrl);
+    });
   });
 });
