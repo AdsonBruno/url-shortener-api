@@ -8,6 +8,7 @@ import {
 import { Request, Response } from 'express';
 import { ValidationException } from '../../application/exceptions/validation.exception';
 import { ConflictException } from '../../application/exceptions/conflict.exception';
+import { NotFoundException } from '../../application/exceptions/not-found.exception';
 import { ErrorResponseDto } from '../../application/dtos/error-response.dto';
 
 @Catch()
@@ -29,6 +30,10 @@ export class ShortenerExceptionFilter implements ExceptionFilter {
       status = HttpStatus.CONFLICT;
       message = exception.message;
       error = 'Conflict';
+    } else if (exception instanceof NotFoundException) {
+      status = HttpStatus.NOT_FOUND;
+      message = exception.message;
+      error = 'Not Found';
     } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const errorResponse = exception.getResponse();
