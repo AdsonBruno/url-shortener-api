@@ -4,23 +4,23 @@ import { NotFoundException } from '../exceptions/not-found.exception';
 import { RedirectToOriginalUrlUseCase } from './redirect-to-original-url.use-case';
 
 class UrlMappingRepositoryStub implements IUrlMappingRepository {
-  async save(_urlMapping: UrlMapping): Promise<void> {
+  async save(_: UrlMapping): Promise<void> {
     return Promise.resolve();
   }
 
-  async findByShortUrlKey(_key: string): Promise<UrlMapping | null> {
+  async findByShortUrlKey(_: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findBySlugOrAlias(_key: string): Promise<UrlMapping | null> {
+  async findBySlugOrAlias(_: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findById(_id: string): Promise<UrlMapping | null> {
+  async findById(_: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findAllByUserId(_userId: string): Promise<UrlMapping[]> {
+  async findAllByUserId(_: string): Promise<UrlMapping[]> {
     return Promise.resolve<UrlMapping[]>([]);
   }
 }

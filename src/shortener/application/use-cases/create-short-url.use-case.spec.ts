@@ -5,23 +5,23 @@ import { CreateShortUrlUseCase } from './create-short-url.use-case';
 import { CreateShortUrlDto } from '../dtos/create-short-url.dto';
 
 class UrlMappingRepositoryStub implements IUrlMappingRepository {
-  async save(_urlMapping: UrlMapping): Promise<void> {
+  async save(_: UrlMapping): Promise<void> {
     return Promise.resolve();
   }
 
-  async findByShortUrlKey(): Promise<UrlMapping | null> {
+  async findByShortUrlKey(_: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findBySlugOrAlias(): Promise<UrlMapping | null> {
+  async findBySlugOrAlias(_: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findById(): Promise<UrlMapping | null> {
+  async findById(_: string): Promise<UrlMapping | null> {
     return Promise.resolve<UrlMapping | null>(null);
   }
 
-  async findAllByUserId(): Promise<UrlMapping[]> {
+  async findAllByUserId(_: string): Promise<UrlMapping[]> {
     return Promise.resolve<UrlMapping[]>([]);
   }
 }
