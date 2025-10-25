@@ -12,7 +12,7 @@ export class CreateAccountUseCase {
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher,
     @Inject(ID_GENERATOR) private readonly idGenerator: IIdGenerator,
-  ) {}
+  ) { }
 
   async execute(input: CreateAccountDto): Promise<User> {
     if (input.email === '') {
@@ -23,7 +23,7 @@ export class CreateAccountUseCase {
       throw new Error('Missing param error');
     }
 
-    if (!input.password || input.password.trim() === '') {
+    if (input.password.trim() === '') {
       throw new Error('Password is required');
     }
 
