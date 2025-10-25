@@ -12,10 +12,10 @@ export class CreateAccountUseCase {
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher,
     @Inject(ID_GENERATOR) private readonly idGenerator: IIdGenerator,
-  ) {}
+  ) { }
 
   async execute(input: CreateAccountDto): Promise<User> {
-    if (!input.email || input.email.trim() === '') {
+    if (input.email === '') {
       throw new Error('Email is required');
     }
 
