@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import * as crypto from 'crypto';
+import { Injectable, Inject } from '@nestjs/common';
 import { IIdGenerator } from '../../application/ports/id-generator.interface';
+import { IUuidLibrary } from '../../application/ports/uuid-library.interface';
+import { UUID_LIBRARY } from '../../tokens';
 
 @Injectable()
 export class CryptoIdGeneratorService implements IIdGenerator {
+  constructor(
+    @Inject(UUID_LIBRARY) private readonly uuidLibrary: IUuidLibrary,
+  ) {}
+
   generate(): string {
-    return crypto.randomUUID();
+    return this.uuidLibrary.randomUUID();
   }
 }

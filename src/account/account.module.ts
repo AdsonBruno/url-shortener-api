@@ -5,11 +5,13 @@ import { InMemoryUserRepository } from './infrastructure/persistence/in-memory-u
 import { BcryptPasswordHasher } from './infrastructure/services/bcrypt-password-hasher.service';
 import { CryptoIdGeneratorService } from './infrastructure/services/crypto-id-generator.service';
 import { BcryptCryptoLibraryAdapter } from './infrastructure/adapters/bcrypt-crypto-library.adapter';
+import { NodeCryptoUuidLibraryAdapter } from './infrastructure/adapters/node-crypto-uuid-library.adapter';
 import {
   USER_REPOSITORY,
   PASSWORD_HASHER,
   ID_GENERATOR,
   CRYPTO_LIBRARY,
+  UUID_LIBRARY,
 } from './tokens';
 
 @Module({
@@ -32,6 +34,10 @@ import {
     {
       provide: CRYPTO_LIBRARY,
       useClass: BcryptCryptoLibraryAdapter,
+    },
+    {
+      provide: UUID_LIBRARY,
+      useClass: NodeCryptoUuidLibraryAdapter,
     },
   ],
   exports: [],
