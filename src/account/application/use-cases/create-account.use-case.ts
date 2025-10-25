@@ -12,11 +12,15 @@ export class CreateAccountUseCase {
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher,
     @Inject(ID_GENERATOR) private readonly idGenerator: IIdGenerator,
-  ) { }
+  ) {}
 
   async execute(input: CreateAccountDto): Promise<User> {
     if (input.email === '') {
       throw new Error('Email is required');
+    }
+
+    if (!input.email) {
+      throw new Error('Missing param error');
     }
 
     if (!input.password || input.password.trim() === '') {
