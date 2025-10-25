@@ -58,4 +58,19 @@ describe('CreateAccountUseCase', () => {
       idGeneratorStub,
     };
   };
+
+  describe('Input Validation', () => {
+    it('should throw error when email is empty', async () => {
+      const { sut } = makeSut();
+
+      const invalidInput: CreateAccountDto = {
+        email: '',
+        password: 'invalid_password',
+      };
+
+      const httpResponse = sut.execute(invalidInput);
+
+      await expect(httpResponse).rejects.toThrow(Error('Email is required'));
+    });
+  });
 });
