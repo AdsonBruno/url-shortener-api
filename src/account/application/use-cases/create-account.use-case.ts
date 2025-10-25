@@ -23,8 +23,12 @@ export class CreateAccountUseCase {
       throw new Error('Missing param error');
     }
 
-    if (input.password.trim() === '') {
+    if (input.password === '') {
       throw new Error('Password is required');
+    }
+
+    if (!input.password) {
+      throw new Error('Missing param error');
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
