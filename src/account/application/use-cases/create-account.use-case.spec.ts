@@ -83,7 +83,19 @@ describe('CreateAccountUseCase', () => {
       const httpResponse = sut.execute(invalidInput as CreateAccountDto);
 
       await expect(httpResponse).rejects.toThrow(Error('Missing param error'));
+    });
 
+    it('should throw error when password is empty', async () => {
+      const { sut } = makeSut();
+
+      const invalidInput: CreateAccountDto = {
+        email: 'invalid_email',
+        password: '',
+      };
+
+      const httpResponse = sut.execute(invalidInput);
+
+      await expect(httpResponse).rejects.toThrow(Error('Password is required'));
     });
   });
 });
