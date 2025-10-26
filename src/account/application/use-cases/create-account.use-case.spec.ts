@@ -1,8 +1,8 @@
 import { CreateAccountUseCase } from './create-account.use-case';
 import { CreateAccountDto } from '../dtos/create-account.dto';
-import { IUserRepository } from 'src/account/domain/repositories/user.repository';
+import { IUserRepository } from '../../domain/repositories/user.repository';
 import { IPasswordHasher } from '../ports/password-hasher.interface';
-import { User } from 'src/account/domain/entities/user.entity';
+import { User } from '../../domain/entities/user.entity';
 import { IIdGenerator } from '../ports/id-generator.interface';
 
 describe('CreateAccountUseCase', () => {
@@ -136,6 +136,31 @@ describe('CreateAccountUseCase', () => {
       await expect(httpResponse).rejects.toThrow(
         Error('Password must be at least 6 characters long'),
       );
+    });
+  });
+
+  describe('Business Logic', () => {
+    it('should throw error when user already exists', async () => {
+      const { sut, userRepositoryStub } = makeSut();
+
+      const existingUser = User.create({
+        id: 'existing_id',
+        email: 'existing_email@mail.com',
+        password: 'hashed_password',
+      });
+
+      jest
+        .spyOn(userRepositoryStub, 'findByEmail')
+        .mockResolvedValue(existingUser);
+
+      const validInput: CreateAccountDto = {
+        email: 'existing_email@mail.com',
+        password: 'valid_password',
+      };
+
+      const httpResponse = sut.execute(validInput);
+
+      await expect(httpResponse).rejects.toThrow(Error('User already exists'));
     });
   });
 });
