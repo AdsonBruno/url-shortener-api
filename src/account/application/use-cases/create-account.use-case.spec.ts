@@ -177,5 +177,22 @@ describe('CreateAccountUseCase', () => {
 
       expect(hashSpy).toHaveBeenCalledWith('valid_password');
     });
+
+  });
+
+  it('should call passwordHasher with correct password', async () => {
+    const { sut, passwordHasherStub, userRepositoryStub } = makeSut();
+
+    jest.spyOn(userRepositoryStub, 'findByEmail').mockResolvedValue(null);
+    const hashSpy = jest.spyOn(passwordHasherStub, 'hash');
+
+    const input: CreateAccountDto = {
+      email: 'new@email.com',
+      password: 'mypassword123',
+    };
+
+    await sut.execute(input);
+
+    expect(hashSpy).toHaveBeenCalledWith('mypassword123');
   });
 });
