@@ -8,7 +8,7 @@ import { IIdGenerator } from '../ports/id-generator.interface';
 describe('CreateAccountUseCase', () => {
   class UserRepositoryStub implements IUserRepository {
     findByEmail(_: string): Promise<User | null> {
-      throw new Error('Method not implemented.');
+      return Promise.resolve(null);
     }
     findById(_: string): Promise<User | null> {
       throw new Error('Method not implemented.');
@@ -161,6 +161,21 @@ describe('CreateAccountUseCase', () => {
       const httpResponse = sut.execute(validInput);
 
       await expect(httpResponse).rejects.toThrow(Error('User already exists'));
+    });
+
+    it('should call passwordHasher with correct password', async () => {
+      const { sut, passwordHasherStub } = makeSut();
+
+      const hashSpy = jest.spyOn(passwordHasherStub, 'hash');
+
+      const validInput: CreateAccountDto = {
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      };
+
+      await sut.execute(validInput);
+
+      expect(hashSpy).toHaveBeenCalledWith('valid_password');
     });
   });
 });
