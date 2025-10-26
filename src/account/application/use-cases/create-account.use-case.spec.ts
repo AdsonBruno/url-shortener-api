@@ -109,5 +109,18 @@ describe('CreateAccountUseCase', () => {
 
       await expect(httpResponse).rejects.toThrow(Error('Missing param error'));
     });
+
+    it('should throw error when email format is invalid', async () => {
+      const { sut } = makeSut();
+
+      const invalidInput: CreateAccountDto = {
+        email: 'invalid_email',
+        password: 'valid_password',
+      };
+
+      const httpResponse = sut.execute(invalidInput);
+
+      await expect(httpResponse).rejects.toThrow(Error('Invalid email format'));
+    });
   });
 });
