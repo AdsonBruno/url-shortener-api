@@ -18,13 +18,17 @@ export class UserTypeOrmRepository implements IUserRepository {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const schema = await this.typeOrmRepo.findOne({ where: { email } });
+    const schema = await this.typeOrmRepo.findOne({
+      where: { email, deletedAt: null },
+    });
 
     return schema ? User.hydrate(schema) : null;
   }
 
   async findById(id: string): Promise<User | null> {
-    const schema = await this.typeOrmRepo.findOne({ where: { id } });
+    const schema = await this.typeOrmRepo.findOne({
+      where: { id, deletedAt: null },
+    });
 
     return schema ? User.hydrate(schema) : null;
   }
