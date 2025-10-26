@@ -122,5 +122,20 @@ describe('CreateAccountUseCase', () => {
 
       await expect(httpResponse).rejects.toThrow(Error('Invalid email format'));
     });
+
+    it('should throw error when password is too short', async () => {
+      const { sut } = makeSut();
+
+      const invalidInput: CreateAccountDto = {
+        email: 'valid_email@mail.com',
+        password: '123',
+      };
+
+      const httpResponse = sut.execute(invalidInput);
+
+      await expect(httpResponse).rejects.toThrow(
+        Error('Password must be at least 6 characters long'),
+      );
+    });
   });
 });
