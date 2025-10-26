@@ -2,6 +2,7 @@ import { Body, Controller, Post, HttpStatus, HttpCode } from '@nestjs/common';
 import { CreateAccountUseCase } from '../../application/use-cases/create-account.use-case';
 import { CreateAccountDto } from '../../application/dtos/create-account.dto';
 import { CreateAccountResponseDto } from '../../application/dtos/create-account-response.dto';
+import { HttpResponse } from './http-response.interface';
 
 @Controller('accounts')
 export class AccountController {
@@ -11,21 +12,27 @@ export class AccountController {
   @HttpCode(HttpStatus.CREATED)
   async createAccount(
     @Body() createAccountDto: CreateAccountDto,
-  ): Promise<CreateAccountResponseDto> {
+  ): Promise<HttpResponse<CreateAccountResponseDto | { message: string }>> {
     try {
       const user = await this.createAccountUseCase.execute(createAccountDto);
 
       return {
-        id: user.id,
-        email: user.email,
-        createdAt: user.createdAt,
+        statusCode: HttpStatus.CREATED,
+        body: {
+          id: user.id,
+          email: user.email,
+          createdAt: user.createdAt,
+        },
       };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
 
       if (errorMessage === 'User already exists') {
-        throw new Error('User already exists');
+        return {
+          statusCode: HttpStatus.CONFLICT,
+          body: { message: 'User already exists' },
+        };
       }
       if (
         errorMessage === 'Email is required' ||
@@ -33,9 +40,15 @@ export class AccountController {
         errorMessage === 'Invalid email format' ||
         errorMessage === 'Password must be at least 6 characters long'
       ) {
-        throw new Error(errorMessage);
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          body: { message: errorMessage },
+        };
       }
-      throw new Error('Internal server error');
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        body: { message: 'Internal server error' },
+      };
     }
   }
 }
