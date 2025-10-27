@@ -102,5 +102,18 @@ describe('LoginUseCase', () => {
 
       await expect(promise).rejects.toThrow('Password is required');
     });
+
+    it('should throw error when email format is invalid', async () => {
+      const { sut } = makeSut();
+
+      const invalidInput: LoginDto = {
+        email: 'invalid_email',
+        password: 'valid_password',
+      };
+
+      const promise = sut.execute(invalidInput);
+
+      await expect(promise).rejects.toThrow('Invalid email format');
+    });
   });
 });
