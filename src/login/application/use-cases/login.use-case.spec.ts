@@ -132,5 +132,20 @@ describe('LoginUseCase', () => {
 
       await expect(promise).rejects.toThrow('Invalid credentials');
     });
+
+    it('should call userRepository.findByEmail with correct email', async () => {
+      const { sut, userRepositoryStub } = makeSut();
+
+      const findByEmailSpy = jest.spyOn(userRepositoryStub, 'findByEmail');
+
+      const validInput: LoginDto = {
+        email: 'test@mail.com',
+        password: 'valid_password',
+      };
+
+      await sut.execute(validInput);
+
+      expect(findByEmailSpy).toHaveBeenCalledWith('test@mail.com');
+    });
   });
 });
