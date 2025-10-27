@@ -90,5 +90,17 @@ describe('LoginUseCase', () => {
 
       await expect(promise).rejects.toThrow('Password is required');
     });
+
+    it('should throw error when password is null', async () => {
+      const { sut } = makeSut();
+
+      const invalidInput = {
+        email: 'valid_email@mail.com',
+      } as LoginDto;
+
+      const promise = sut.execute(invalidInput);
+
+      await expect(promise).rejects.toThrow('Password is required');
+    });
   });
 });
