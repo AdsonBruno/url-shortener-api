@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ShortenerModule } from './shortener/shortener.module';
 import { AccountModule } from './account/account.module';
+import { LoginModule } from './login/login.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     ShortenerModule,
     AccountModule,
+    LoginModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
