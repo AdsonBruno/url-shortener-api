@@ -147,5 +147,109 @@ describe('LoginUseCase', () => {
 
       expect(findByEmailSpy).toHaveBeenCalledWith('test@mail.com');
     });
+
+    it('should call passwordHasher.compare with correct parameters', async () => {
+      const { sut, passwordHasherStub } = makeSut();
+
+      const compareSpy = jest.spyOn(passwordHasherStub, 'compare');
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'plain_password',
+      };
+
+      await sut.execute(validInput);
+
+      expect(compareSpy).toHaveBeenCalledWith(
+        'plain_password',
+        'hashed_password',
+      );
+    });
+
+    it('should throw error when password does not match', async () => {
+      const { sut, passwordHasherStub } = makeSut();
+
+      jest.spyOn(passwordHasherStub, 'compare').mockResolvedValue(false);
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'wrong_password',
+      };
+
+      const promise = sut.execute(validInput);
+
+      await expect(promise).rejects.toThrow('Invalid credentials');
+    });
+
+    it('should return user data when credentials are valid', async () => {
+      const { sut } = makeSut();
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'correct_password',
+      };
+
+      const result = await sut.execute(validInput);
+
+      expect(result).toEqual({
+        success: true,
+        user: {
+          id: 'valid_user_id',
+          email: 'valid_email@mail.com',
+        },
+      });
+    });
+
+    it('should not return password in response', async () => {
+      const { sut } = makeSut();
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'correct_password',
+      };
+
+      const result = await sut.execute(validInput);
+
+      expect(result.user).not.toHaveProperty('password');
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('Repository Integration', () => {
+    it('should handle repository errors gracefully', async () => {
+      const { sut, userRepositoryStub } = makeSut();
+
+      jest
+        .spyOn(userRepositoryStub, 'findByEmail')
+        .mockRejectedValue(new Error('Database connection failed'));
+
+      const validInput: LoginDto = {
+        email: 'test@mail.com',
+        password: 'valid_password',
+      };
+
+      const promise = sut.execute(validInput);
+
+      await expect(promise).rejects.toThrow('Database connection failed');
+    });
+  });
+
+  describe('Password Hasher Integration', () => {
+    it('should handle password hasher errors gracefully', async () => {
+      const { sut, passwordHasherStub } = makeSut();
+
+      jest
+        .spyOn(passwordHasherStub, 'compare')
+        .mockRejectedValue(new Error('Hashing library error'));
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      };
+
+      const promise = sut.execute(validInput);
+
+      await expect(promise).rejects.toThrow('Hashing library error');
+    });
   });
 });
