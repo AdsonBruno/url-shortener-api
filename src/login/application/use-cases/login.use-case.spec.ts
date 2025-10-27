@@ -116,4 +116,21 @@ describe('LoginUseCase', () => {
       await expect(promise).rejects.toThrow('Invalid email format');
     });
   });
+
+  describe('Authentication Logic', () => {
+    it('should throw error when user does not exist', async () => {
+      const { sut, userRepositoryStub } = makeSut();
+
+      jest.spyOn(userRepositoryStub, 'findByEmail').mockResolvedValue(null);
+
+      const validInput: LoginDto = {
+        email: 'nonexistent@mail.com',
+        password: 'valid_password',
+      };
+
+      const promise = sut.execute(validInput);
+
+      await expect(promise).rejects.toThrow('Invalid credentials');
+    });
+  });
 });
