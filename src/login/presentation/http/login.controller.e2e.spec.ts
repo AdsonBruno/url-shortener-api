@@ -60,7 +60,7 @@ describe('LoginController (E2E)', () => {
       .send(loginDto)
       .expect(200)
       .expect((res) => {
-        const responseBody = res.body as HttpResponse<LoginResponseDto>
+        const responseBody = res.body as HttpResponse<LoginResponseDto>;
         expect(responseBody.statusCode).toBe(200);
         expect(responseBody.body.success).toBe(true);
         expect(responseBody.body.user.email).toBe('test@example.com');
