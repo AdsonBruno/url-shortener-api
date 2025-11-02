@@ -3,13 +3,16 @@ import { LoginDto } from '../dtos/login.dto';
 import { LoginResponseDto } from '../dtos/login-response.dto';
 import { IUserRepository } from '../../../account/domain/repositories/user.repository';
 import { IPasswordHasher } from '../../../account/application/ports/password-hasher.interface';
+import { ITokenService } from '../../../auth/application/ports/token-service.interface';
 import { USER_REPOSITORY, PASSWORD_HASHER } from '../../../account/tokens';
+import { TOKEN_SERVICE } from '../../../auth/tokens';
 
 @Injectable()
 export class LoginUseCase {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: IPasswordHasher,
+    @Inject(TOKEN_SERVICE) private readonly tokenService: ITokenService,
   ) {}
 
   async execute(loginDto: LoginDto): Promise<LoginResponseDto> {
@@ -40,12 +43,18 @@ export class LoginUseCase {
       throw new Error('Invalid credentials');
     }
 
+    const accessToken = await this.tokenService.generateToken({
+      sub: user.id,
+      email: user.email,
+    });
+
     return {
       success: true,
       user: {
         id: user.id,
         email: user.email,
       },
+      accessToken,
     };
   }
 }
