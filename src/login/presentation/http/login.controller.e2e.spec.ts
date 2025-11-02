@@ -2,6 +2,7 @@ import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { LoginModule } from '../../login.module';
 import { AccountModule } from '../../../account/account.module';
 import { UserSchema } from '../../../account/infrastructure/persistence/typeorm/schemas/user.schema';
@@ -27,6 +28,10 @@ describe('LoginController (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: '.env.example',
+        }),
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',
