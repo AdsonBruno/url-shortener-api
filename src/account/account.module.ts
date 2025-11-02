@@ -42,6 +42,15 @@ import {
       useClass: NodeCryptoUuidLibraryAdapter,
     },
   ],
-  exports: [],
+  exports: [
+    {
+      provide: USER_REPOSITORY,
+      useClass: UserTypeOrmRepository,
+    },
+    {
+      provide: PASSWORD_HASHER,
+      useClass: BcryptPasswordHasher,
+    },
+  ],
 })
 export class AccountModule {}
