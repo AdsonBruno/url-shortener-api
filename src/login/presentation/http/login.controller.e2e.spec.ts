@@ -20,6 +20,7 @@ describe('LoginController (E2E)', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      accessToken: 'test.jwt.token',
     }),
   };
 
@@ -65,6 +66,8 @@ describe('LoginController (E2E)', () => {
         expect(responseBody.body.success).toBe(true);
         expect(responseBody.body.user.email).toBe('test@example.com');
         expect(responseBody.body.user.id).toBe('test-user-id');
+        expect(responseBody.body.accessToken).toBe('test.jwt.token');
+        expect(responseBody.body.accessToken).toBeDefined();
       });
   });
 });
