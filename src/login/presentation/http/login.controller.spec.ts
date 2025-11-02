@@ -38,6 +38,7 @@ describe('LoginController', () => {
           id: 'user-id-123',
           email: 'user@example.com',
         },
+        accessToken: 'valid.jwt.token',
       };
 
       jest.spyOn(loginUseCase, 'execute').mockResolvedValue(mockLoginResponse);
@@ -60,6 +61,7 @@ describe('LoginController', () => {
           id: 'user-id-123',
           email: 'test@example.com',
         },
+        accessToken: 'valid.jwt.token',
       };
 
       const executeSpy = jest
@@ -190,6 +192,7 @@ describe('LoginController', () => {
           id: 'user-id-123',
           email: 'user@example.com',
         },
+        accessToken: 'valid.jwt.token',
       };
 
       jest.spyOn(loginUseCase, 'execute').mockResolvedValue(mockLoginResponse);
