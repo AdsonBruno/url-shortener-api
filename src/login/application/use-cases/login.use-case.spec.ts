@@ -2,6 +2,7 @@ import { LoginUseCase } from './login.use-case';
 import { LoginDto } from '../dtos/login.dto';
 import { IUserRepository } from '../../../account/domain/repositories/user.repository';
 import { IPasswordHasher } from '../../../account/application/ports/password-hasher.interface';
+import { ITokenService } from '../../../auth/application/ports/token-service.interface';
 import { User } from '../../../account/domain/entities/user.entity';
 
 describe('LoginUseCase', () => {
@@ -34,21 +35,41 @@ describe('LoginUseCase', () => {
     }
   }
 
+  class TokenServiceStub implements ITokenService {
+    async generateToken(_: { sub: string; email: string }): Promise<string> {
+      return Promise.resolve('valid_jwt_token');
+    }
+
+    async verifyToken(_: string): Promise<any> {
+      return Promise.resolve({
+        sub: 'valid_user_id',
+        email: 'valid_email@mail.com',
+      });
+    }
+  }
+
   interface SutTypes {
     sut: LoginUseCase;
     userRepositoryStub: IUserRepository;
     passwordHasherStub: IPasswordHasher;
+    tokenServiceStub: ITokenService;
   }
 
   const makeSut = (): SutTypes => {
     const userRepositoryStub = new UserRepositoryStub();
     const passwordHasherStub = new PasswordHasherStub();
-    const sut = new LoginUseCase(userRepositoryStub, passwordHasherStub);
+    const tokenServiceStub = new TokenServiceStub();
+    const sut = new LoginUseCase(
+      userRepositoryStub,
+      passwordHasherStub,
+      tokenServiceStub,
+    );
 
     return {
       sut,
       userRepositoryStub,
       passwordHasherStub,
+      tokenServiceStub,
     };
   };
 
@@ -197,6 +218,7 @@ describe('LoginUseCase', () => {
           id: 'valid_user_id',
           email: 'valid_email@mail.com',
         },
+        accessToken: 'valid_jwt_token',
       });
     });
 
@@ -250,6 +272,58 @@ describe('LoginUseCase', () => {
       const promise = sut.execute(validInput);
 
       await expect(promise).rejects.toThrow('Hashing library error');
+    });
+  });
+
+  describe('JWT Token Generation', () => {
+    it('should return JWT token on successful authentication', async () => {
+      const { sut } = makeSut();
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'correct_password',
+      };
+
+      const result = await sut.execute(validInput);
+
+      expect(result.accessToken).toBeDefined();
+      expect(result.accessToken).toBe('valid_jwt_token');
+      expect(typeof result.accessToken).toBe('string');
+    });
+
+    it('should call tokenService.generateToken with correct payload', async () => {
+      const { sut, tokenServiceStub } = makeSut();
+
+      const generateTokenSpy = jest.spyOn(tokenServiceStub, 'generateToken');
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'correct_password',
+      };
+
+      await sut.execute(validInput);
+
+      expect(generateTokenSpy).toHaveBeenCalledWith({
+        sub: 'valid_user_id',
+        email: 'valid_email@mail.com',
+      });
+    });
+
+    it('should handle token service errors gracefully', async () => {
+      const { sut, tokenServiceStub } = makeSut();
+
+      jest
+        .spyOn(tokenServiceStub, 'generateToken')
+        .mockRejectedValue(new Error('Token generation failed'));
+
+      const validInput: LoginDto = {
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
+      };
+
+      const promise = sut.execute(validInput);
+
+      await expect(promise).rejects.toThrow('Token generation failed');
     });
   });
 });
