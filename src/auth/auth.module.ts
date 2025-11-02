@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { JwtTokenService } from './infrastructure/services/jwt-token.service';
+import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { TOKEN_SERVICE } from './tokens';
 
 @Module({
   imports: [
     ConfigModule,
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -19,6 +22,7 @@ import { TOKEN_SERVICE } from './tokens';
     }),
   ],
   providers: [
+    JwtStrategy,
     {
       provide: TOKEN_SERVICE,
       useClass: JwtTokenService,
@@ -26,4 +30,4 @@ import { TOKEN_SERVICE } from './tokens';
   ],
   exports: [TOKEN_SERVICE],
 })
-export class AuthModule {}
+export class AuthModule { }
